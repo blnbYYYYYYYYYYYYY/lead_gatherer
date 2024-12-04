@@ -10,17 +10,19 @@ from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from config import config
-import client
+from client import client, staff_hotline, staff_post
 
 logging.basicConfig(level=logging.DEBUG,
                     filename="log.txt",
                     filemode="w"
                     )
 
+bot = Bot(token=config.bot_token.get_secret_value(),
+          default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN_V2, link_preview_is_disabled=True))
+
+user_hotline_mode = {}
 
 async def main():
-    bot = Bot(token=config.bot_token.get_secret_value(),
-          default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN_V2))
     dp = Dispatcher()
     dp.include_router(client.router)
     await dp.start_polling(bot)
