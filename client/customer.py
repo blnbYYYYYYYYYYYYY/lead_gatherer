@@ -1,4 +1,4 @@
-from aiogram import F, Router, types, exceptions
+from aiogram import F, Router, types
 from aiogram.filters import Command
 from aiogram.utils.formatting import Text, as_list
 
@@ -17,9 +17,6 @@ refs = io_json("refs")
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, command: Command = None):
-	global auth_status	# объявление глобальных переменных в функции (не требуется, можно удалять)
-	global inline_keyboard_msg_id
-	global refs
 
 	try:
 
@@ -92,9 +89,6 @@ async def cmd_start(message: types.Message, command: Command = None):
 
 @router.callback_query(F.data == "start_hotline_chat")
 async def start_hotline_chat(callback: types.CallbackQuery):	
-	global hotline_chat
-	global inline_keyboard_msg_id
-	global refs
 
 	await callback.message.edit_reply_markup()	# убирает инлайн клавиатуру с предыдущего сообщения
 	await callback.message.answer(**texts.start_hotline_alert_1.as_kwargs())
@@ -139,7 +133,6 @@ async def start_hotline_chat(callback: types.CallbackQuery):
 
 @router.message(IsHotlineMode(hotline_chat=hotline_chat))	
 async def send_msg_to_htln(message: types.Message):
-	global inline_keyboard_msg_id
 
 	code_to_execute = """bot.send_{0}(
 							{1}, 
@@ -212,9 +205,6 @@ async def send_msg_to_htln(message: types.Message):
 
 @router.callback_query(F.data == "end_hotline_chat")
 async def end_hotline_chat(callback: types.CallbackQuery):
-	global hotline_chat
-	global inline_keyboard_msg_id
-	global auth_status
 
 	await bot.close_forum_topic(
 			chat_id=config.superchat_id.get_secret_value(),
@@ -245,8 +235,6 @@ async def end_hotline_chat(callback: types.CallbackQuery):
 
 @router.callback_query(F.data == "clt_auth")
 async def auth_query(callback: types.CallbackQuery):
-	global inline_keyboard_msg_id
-	global auth_status
 
 	await callback.message.edit_reply_markup()
 	message = await callback.message.answer(
@@ -278,7 +266,6 @@ async def auth_query(callback: types.CallbackQuery):
 
 @router.message(lambda m: auth_status[m.chat.id] == 0)
 async def auth_update(message: types.Message):
-	global inline_keyboard_msg_id
 
 	await bot.delete_messages(
 		chat_id=message.chat.id, 
@@ -315,9 +302,6 @@ async def auth_update(message: types.Message):
 
 @router.callback_query(F.data.startswith("contact_"))
 async def contact_(callback: types.CallbackQuery):
-	global auth_status
-	global hotline_chat
-	global inline_keyboard_msg_id
 
 	mode = callback.data.split("_")[1] # парсим данные колбэка
 

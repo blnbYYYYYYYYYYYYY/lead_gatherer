@@ -18,13 +18,13 @@ class ChatTypeFilter(BaseFilter):
 
 class IsStaffFilter(BaseFilter):
     def __init__(self, mode: Union[str, None] = None):
-        self.mode = mode
+        self.mode = mode 
         self.superchat_id = config.superchat_id.get_secret_value()
 
     async def __call__(self, message: Message) -> bool:
         if str(message.chat.id) == self.superchat_id:
             if self.mode == "post":
-                return message.message_thread_id == None
+                return message.message_thread_id == None    # т.к. постим через дженерал топик, а у него айди нан
             else:
                 return message.message_thread_id != None
         else:
@@ -47,6 +47,6 @@ class IsHotlineMode(BaseFilter):
 
     async def __call__(self, message: Message) -> bool:
         if message.chat.id in self.hotline_chat.keys():
-            return self.hotline_chat[message.chat.id] > 0
+            return self.hotline_chat[message.chat.id] > 0 # т.к. закрытые топики с отрицательными числами
         else:
             return False

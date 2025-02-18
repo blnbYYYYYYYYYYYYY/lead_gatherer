@@ -13,9 +13,11 @@ def ikb_default(is_auth=0):
 		types.InlineKeyboardButton(**Bold("Задать вопрос").as_kwargs(), callback_data="start_hotline_chat")]]
 	
 	if is_auth in (-1, 0):
-		buttons[0].append(types.InlineKeyboardButton(**Strikethrough("Оставить номер").as_kwargs(), callback_data="clt_auth"))
+		content = Text("Оставить номер")
 	else:
-		buttons[0].append(types.InlineKeyboardButton(text="Оставить номер", callback_data="clt_auth"))
+		content = Text("✅ Оставить номер")
+
+	buttons[0].append(types.InlineKeyboardButton(**content.as_kwargs(), callback_data="clt_auth"))
 	
 	return types.InlineKeyboardMarkup(inline_keyboard=buttons)
 

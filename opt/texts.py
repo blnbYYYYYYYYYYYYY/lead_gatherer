@@ -1,4 +1,4 @@
-from aiogram.utils.formatting import Text, as_key_value, as_list, TextLink, Bold, Italic
+from aiogram.utils.formatting import Text, as_list, TextLink, Bold, Underline
 
 def start_ref (ref:str):
     return as_list(
@@ -24,24 +24,22 @@ def start_to_hotline(callback, mode, refs):
     if mode == "call":
         msg_text = Text(f"Пользователь @{callback.from_user.username}, ",
             f"под именем {callback.from_user.full_name}, ",
-            f"просит связаться с ним через ", Bold("звонок "), "по номеру ",
+            f"просит связаться с ним через ", Underline("звонок "), "по номеру ",
             f"{callback.message.entities[0].extract_from(callback.message.text)}")
 
     elif mode == "chat":
         msg_text = Text(f"Пользователь @{callback.from_user.username}, ",
             f"под именем {callback.from_user.full_name}, ",
-            f"просит связаться с ним через ", Bold("мессенджер "), "по номеру ",
+            f"просит связаться с ним через ", Underline("мессенджер "), "по номеру ",
             f"{callback.message.entities[0].extract_from(callback.message.text)}")
     
     else:
         msg_text = Text(f"Обращение пользователя @{callback.from_user.username}, ",
             f"под именем {callback.from_user.full_name}",
             )
-        
-    print("im here")
     
     if callback.message.chat.id in refs.keys():
-        print("but should be here")
+
         links = ""
 
         for id, ref in enumerate(refs[callback.message.chat.id]):
@@ -56,7 +54,12 @@ def start_to_hotline(callback, mode, refs):
                 links
             )
         )
-    print("and here")
+
+    """
+    формируем текст сообщения согласно запросу
+    затем добавляем реферальные ссылки, если понадобится 
+    """
+
     return msg_text
 
 start_hotline_alert_1 = Text("Вы начали диалог с администратором бота 🙌")
