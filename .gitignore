@@ -162,4 +162,11 @@ cython_debug/
 #.idea/
 
 .DS_Store
-log.txt
+log
+logs
+data
+files
+notes.txt
+.env
+.gitignore
+redis.conf

@@ -1,4 +1,5 @@
-from misc.config import config
+import os
+from dotenv import load_dotenv
 from typing import Union, NamedTuple
 
 from aiogram import Bot
@@ -21,8 +22,13 @@ class Verification(StatesGroup):
 	share_name = State()
 
 
+class Post(StatesGroup):
+	share_post = State()
+
+load_dotenv(".env")
+
 bot = Bot(
-	token=config.bot_token.get_secret_value(),
+	token=os.getenv("BOT_TOKEN"),
     default=DefaultBotProperties(
 		parse_mode=ParseMode.MARKDOWN_V2, 
 		link_preview_is_disabled=True))

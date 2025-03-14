@@ -1,3 +1,4 @@
+import os
 import asyncio
 import logging
 
@@ -12,7 +13,7 @@ from handlers.staff_post import router as stf_pst_router
 from handlers.staff_hotline import router as stf_htln_router
 
 logging.basicConfig(level=logging.DEBUG,
-                    filename="log.txt",
+                    filename="log/log.txt",
                     filemode="w",
                     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
                     )
@@ -20,8 +21,8 @@ logging.basicConfig(level=logging.DEBUG,
 
 async def main():
     dp = Dispatcher(
-        storage=RedisStorage(redis=db.redis.Redis).from_url("redis://localhost:6379/5"), 
-        fsm_strategy=FSMStrategy.USER_IN_CHAT
+        storage=RedisStorage(redis=db.redis.Redis).from_url(f"redis://redis:6379/5"), 
+        fsm_strategy=FSMStrategy.CHAT_TOPIC
     )
     dp.include_routers(stf_pst_router, clt_router, stf_htln_router)
 

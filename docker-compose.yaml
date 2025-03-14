@@ -1,0 +1,47 @@
+services:
+  bot_app:
+    image: lead_gatherer
+    build: 
+      context: bot_app/
+    container_name: bot_container
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    env_file:
+      - '.env'
+    volumes:
+      - './log:/usr/src/app/log'
+    links:
+      - redis
+    depends_on:
+      redis:
+        condition: service_healthy
+    tty: true
+    stdin_open: true
+    networks:
+      - dev
+  redis:
+    image: redis:7.2.7
+    container_name: redis_container
+    volumes:
+      - './redisdata:/data'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    networks:
+      - dev
+networks:
+  dev:

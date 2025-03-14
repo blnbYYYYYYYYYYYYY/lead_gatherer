@@ -1,8 +1,9 @@
+import os
+
 from aiogram.filters import Command
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 
-from misc.config import config
 from misc.opt import keyboards, texts
 from misc.filters import ChatTypeFilter
 from misc.bot import bot, HotLine, Verification, Contact
@@ -10,7 +11,8 @@ from misc.util import (open_topic,
                        close_topic, 
                        get_start_message, 
                        update_keyboard, 
-                       extract_contact_info)
+                       extract_contact_info,
+                       redirect_message)
 
 router = Router() 
 router.message.filter(ChatTypeFilter(chat_type="private"))
@@ -30,7 +32,8 @@ async def cmd_start(message: types.Message, state: FSMContext, command: Command 
     message_answer = await message.answer(
         **message_text.as_kwargs())
     
-    await update_keyboard(message_answer.message_id, state, keyboards.ikb_default(is_verified))
+    await update_keyboard(
+        message_answer.message_id, state, keyboards.ikb_default(is_verified))
 
 
 @router.callback_query(F.data == "start_hotline")
@@ -45,42 +48,25 @@ async def start_hotline(callback: types.CallbackQuery, state: FSMContext):
 
     refs = await state.get_value("refs")
     await bot.send_message(
-        chat_id=config.superchat_id.get_secret_value(),
+        chat_id=os.getenv("SUPERCHAT_ID"),
         message_thread_id=thread_id,
         **texts.bi_2hotline(callback, refs).as_kwargs())
 
 
 @router.message(HotLine.enabled)
 async def redirect_user_message(message: types.Message, state: FSMContext):
-
-    code_to_execute = """bot.send_{0}(
-                            {1}, 
-                            chat_id=config.superchat_id.get_secret_value(), 
-                            message_thread_id=thread_id
-                        )"""
-
-    content_type = (str(message.content_type).split(".")[1].lower())  # парсим тип контента
     thread_id = await state.get_value("thread_id")
+    message_answer = await redirect_message(
+        message,
+        os.getenv("SUPERCHAT_ID"),
+        thread_id)
     
-    if content_type in ("venue", "location", "poll"):
-        await bot.delete_message(
-            chat_id=message.chat.id, 
-            message_id=message.message_id)
-        message_answer = await message.answer(**texts.a_wrong_type.as_kwargs())
-        await update_keyboard(message_answer.message_id, state, keyboards.ik_end_chat)
-
-    elif content_type == "text":
-        content = message.md_text
-        await eval(code_to_execute.format(
-            "message", "text=content"))
-
-    elif content_type == "photo":
-        await eval(code_to_execute.format(
-            content_type, f"{content_type}=message.{content_type}[-1].file_id"))
-        
-    else:
-        await eval(code_to_execute.format(
-            content_type, f"{content_type}=message.{content_type}.file_id"))
+    if message_answer.text != message.text:
+        await update_keyboard(
+            current_message_id=message_answer.message_id,
+            state=state,
+            reply_markup=keyboards.ik_end_chat)
+    
 
 
 @router.callback_query(F.data == "end_hotline")
@@ -117,7 +103,7 @@ async def phone_number_verification(message: types.Message, state: FSMContext):
         thread_id = await open_topic(state)
          
         business_message = await bot.send_message(
-            chat_id=config.superchat_id.get_secret_value(),
+            chat_id=os.getenv("SUPERCHAT_ID"),
             message_thread_id=thread_id,
             **texts.bi_2hotline(message, refs, contact).as_kwargs())
         await state.update_data(business_message_id = business_message.message_id)
@@ -159,7 +145,7 @@ async def name_verification(message: types.Message, state:FSMContext):
     await update_keyboard(verification_message_id, state, keyboards.ikb_default(is_verified=1),)
 
     await bot.edit_message_text(
-        chat_id=config.superchat_id.get_secret_value(),
+        chat_id=os.getenv("SUPERCHAT_ID"),
         message_id=business_message_id,
         **texts.bi_2hotline(message, refs, contact).as_kwargs())
 

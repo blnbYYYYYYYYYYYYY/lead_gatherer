@@ -1,7 +1,7 @@
 from typing import Union
 
 from aiogram import types
-from aiogram.utils.formatting import Text, as_list, TextLink, Bold, Code, Italic
+from aiogram.utils.formatting import Text, as_list, TextLink, Bold, Code, Italic, as_numbered_list, Underline
 
 from misc.bot import Contact
 
@@ -29,14 +29,35 @@ i_share_contact = as_list(
 a_wrong_type = as_list(
     Text("🤖"),
     Text("Упссс... Что-то пошло не так...:(("),
-    Text("Возможно обмен данным типом контента не поддерживается"),)
+    Text("Возможно обмен данным типом контента не поддерживается"))
 
-as_wrong_type = Text("Упссс... Что-то пошло не так...:((")
+
+istaff_help = as_list(
+    Text("Отправьте сюда текст поста и я добавлю для него кнопку с реферальной ссылкой"),
+    Text("Шаги отправки:"),
+    as_numbered_list(
+        Text("Отправить напрямую в ", 
+            TextLink("канал", url="https://t.me/remarket_msk"), 
+            " фото, видео, аудио или документы"),
+        Text("Отправить в этот подраздел текст поста"),
+        Text("Подтвердить отправку текста поста нажатием на кнопку")
+    )
+)
+
+istaff_success = Text("Отправлено")
+
+istaff_post = as_list(
+    Text("Ваш пост будет выглядеть так ⤴️"),
+    Text(" "),
+    Text("Если вы хотите изменить текст поста,"),
+    Text("просто отправьте мне его еще раз")
+)
+
 
 def bi_start (ref: str) -> Text:
     return as_list(
         Text("Здравствуйте!"),
-        Text("Я администратор телеграм канала", TextLink("Отдел Застройщиков, Лубянка", url="https://t.me/remarket_msk"), "."),
+        Text("Я администратор телеграм канала", TextLink(" Отдел Застройщиков, Лубянка", url="https://t.me/remarket_msk"), "."),
         Text("Вы оставили ➕ под ", TextLink("постом", url=f"https://t.me/remarket_msk/{ref}"), "."),
         Text(
             "Нажмите на кнопку ", Bold("Оставить номер"), " и менеджер вышлет вам подробную презентацию о ",
@@ -73,20 +94,20 @@ def bi_contact_confirm(user_name: str, phone_number: str) -> Text:
     )
 	
 def bi_2hotline(
-        obj: types.Message, 
+        obj: Union[types.Message, types.CallbackQuery], 
         refs: Union[str, list, None], 
         contact: Union[Contact, None] = None) -> Text:
 
     if contact:
         if contact.full_name != obj.from_user.full_name:
-            full_name = contact.full_name + " или " + obj.from_user.full_name
+            full_name = contact.full_name + " | " + obj.from_user.full_name
 
         else:
             full_name = obj.from_user.full_name
 
         msg_text = Text(
             f"Пользователь @{obj.from_user.username}, ",
-            f"под именем {full_name}, ",
+            f"под именем ", Underline(f"{full_name} "),
             f"просит связаться с ним по номеру ",
             f"{contact.phone_number}"
         )
@@ -94,7 +115,7 @@ def bi_2hotline(
     else:
         msg_text = Text(
             f"Обращение пользователя @{obj.from_user.username}, ",
-            f"под именем {obj.from_user.full_name}",
+            f"под именем ", Underline(f"{obj.from_user.full_name}")
         )
         
     if refs:
