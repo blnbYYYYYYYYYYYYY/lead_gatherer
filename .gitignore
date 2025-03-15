@@ -165,6 +165,7 @@ cython_debug/
 log
 logs
 data
+redisdata
 files
 notes.txt
 .env
