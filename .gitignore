@@ -168,5 +168,6 @@ data
 files
 notes.txt
 .env
+.env_prod
 .gitignore
 redis.conf

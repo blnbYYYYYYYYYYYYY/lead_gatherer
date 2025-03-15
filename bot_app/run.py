@@ -1,3 +1,4 @@
+import logging.config
 import os
 import asyncio
 import logging
@@ -15,7 +16,7 @@ from handlers.staff_hotline import router as stf_htln_router
 logging.basicConfig(level=logging.DEBUG,
                     filename="log/log.txt",
                     filemode="w",
-                    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+                    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"                
                     )
 
 
@@ -25,6 +26,8 @@ async def main():
         fsm_strategy=FSMStrategy.CHAT_TOPIC
     )
     dp.include_routers(stf_pst_router, clt_router, stf_htln_router)
+
+    print("looks like all components are ready to start\nlet's hunger games begins")
 
     await dp.start_polling(bot, handle_signals=False)
 
