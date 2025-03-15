@@ -51,6 +51,7 @@ async def start_hotline(callback: types.CallbackQuery, state: FSMContext):
         chat_id=os.getenv("SUPERCHAT_ID"),
         message_thread_id=thread_id,
         **texts.bi_2hotline(callback, refs).as_kwargs())
+    await callback.answer()
 
 
 @router.message(HotLine.enabled)
@@ -76,6 +77,7 @@ async def end_hotline(callback: types.CallbackQuery, state:FSMContext):
 
     is_verified = await state.get_value("is_verified")
     await update_keyboard(message_answer.message_id, state, keyboards.ikb_default(is_verified))
+    await callback.answer()
 
 
 @router.callback_query(F.data == "verify_number")

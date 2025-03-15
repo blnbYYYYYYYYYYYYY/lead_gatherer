@@ -1,6 +1,8 @@
+import os 
+from typing import Optional
+
 from aiogram import types
 from aiogram.utils.formatting import Text
-from typing import Optional
 
 rk_share_contact = types.ReplyKeyboardMarkup(
 		keyboard=[[types.KeyboardButton(
@@ -58,7 +60,7 @@ def ikb_ref(message_id: Optional[int]= None) -> types.InlineKeyboardMarkup:
 			[
 				types.InlineKeyboardButton(
 					text="➕", 
-					url=f"https://t.me/lead_gatherer_bot?start=request_{message_id}"
+					url=os.getenv("BOT_URL") + f"?start=request_{message_id}"
 				)
 			]
 		]

@@ -25,9 +25,10 @@ async def redirect_staff_message(message: types.Message, state: FSMContext):
         "ik_message_id")
     message_answer = await redirect_message(
         message,
-        chat_id)
+        chat_id,
+        emoji="👩🏻‍💻")
 
-    if message_answer.text == message.text:
+    if message_answer.text == "👩🏻‍💻\n" + message.md_text:
         await update_keyboard(
             current_message_id=message_answer.message_id,
             previous_message_id=ik_message_id,

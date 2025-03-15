@@ -189,7 +189,7 @@ async def extract_contact_info(message: types.Message, state: FSMContext) -> Uni
     return Contact(full_name, phone_number)
 
 
-async def redirect_message(message: types.Message, chat_id: int, thread_id: int = None) -> types.Message:
+async def redirect_message(message: types.Message, chat_id: int, thread_id: int = None, emoji: Optional[str] = None) -> types.Message:
 
     content_type = str(message.content_type).split(".")[1].lower()
 
@@ -208,8 +208,12 @@ async def redirect_message(message: types.Message, chat_id: int, thread_id: int 
         # и отправляет предупреждение
 
     elif content_type == "text":
+        if emoji:
+            message_text = emoji + "\n" + message.md_text
+        else:
+            message_text = message.md_text
         message_answer = await bot.send_message(
-                            text=message.md_text, 
+                            text=message_text, 
                             chat_id=chat_id, 
                             message_thread_id=thread_id)
         
